@@ -1,17 +1,28 @@
 const Card = ({ attributes }) => {
   return (
-    <div className="w-40 h-full bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col">
+    <div className="w-40 h-60 relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col group">
       <img
         src={attributes.image}
         alt={attributes.name}
         className="w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <h3 className="text-white font-semibold text-base mb-1">
+
+      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex flex-col justify-end p-3 opacity-0 group-hover:opacity-100 pointer-events-none text-left">
+        <h3 className="text-white font-semibold text-sm mb-1 truncate">
           {attributes.name}
         </h3>
-        <p className="text-red-300 text-sm">❤️ {attributes.favorites}</p>
+        {attributes.nativeName && (
+          <p className="text-gray-300 text-xs truncate">
+            {attributes.nativeName}
+          </p>
+        )}
       </div>
+
+      <a
+        href={`/seiyuu/${attributes.id}`}
+        className="absolute inset-0"
+        aria-label={`View details for ${attributes.name}`}
+      ></a>
     </div>
   );
 };

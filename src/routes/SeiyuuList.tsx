@@ -13,7 +13,7 @@ const SeiyuuList = () => {
         body: JSON.stringify({
           query: `
             query ($page: Int) {
-              Page(page: $page, perPage: 25) {
+              Page(page: $page, perPage: 50) {
                 staff(sort: FAVOURITES_DESC) {
                   id
                   name {
@@ -59,10 +59,10 @@ const SeiyuuList = () => {
             <Card
               key={seiyuu.id}
               attributes={{
+                id: seiyuu.id,
                 image: seiyuu.image.large,
                 name: seiyuu.name.full,
                 nativeName: seiyuu.name.native,
-                favorites: seiyuu.favourites,
               }}
             />
           ))

@@ -5,6 +5,7 @@ import { useRoutes } from "react-router-dom";
 import Home from "./routes/Home";
 import Create from "./routes/Create";
 import SeiyuuList from "./routes/SeiyuuList";
+import Seiyuu from "./routes/Seiyuu";
 
 function App() {
   const element = useRoutes([
@@ -19,6 +20,10 @@ function App() {
     {
       path: "/seiyuu",
       element: <SeiyuuList />,
+    },
+    {
+      path: "/seiyuu/:id",
+      element: <Seiyuu />,
     },
   ]);
   return (
