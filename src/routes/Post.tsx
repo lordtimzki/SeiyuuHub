@@ -86,9 +86,13 @@ const Post = () => {
     };
   }
 
+  const apiUrl = import.meta.env.DEV
+    ? "/api/anilist"
+    : "/.netlify/functions/anilist";
+
   const fetchSeiyuuName = async (seiyuuId: string): Promise<void> => {
     try {
-      const response = await fetch("/api/anilist", {
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

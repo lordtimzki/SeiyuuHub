@@ -39,6 +39,10 @@ const Create = () => {
     return match && match[7].length === 11 ? match[7] : false;
   };
 
+  const apiUrl = import.meta.env.DEV
+    ? "/api/anilist"
+    : "/.netlify/functions/anilist";
+
   const validateSeiyuu = async () => {
     if (!formData.seiyuuId || isNaN(parseInt(formData.seiyuuId))) {
       setSeiyuuError("Please enter a valid numeric ID");
@@ -47,7 +51,7 @@ const Create = () => {
 
     try {
       setValidating(true);
-      const response = await fetch("/api/anilist", {
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -14,6 +14,10 @@ interface Post {
   video?: string;
 }
 
+const apiUrl = import.meta.env.DEV
+  ? "/api/anilist"
+  : "/.netlify/functions/anilist";
+
 const Home = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
@@ -119,7 +123,7 @@ const Home = () => {
       const namesMap: Record<string, string> = {};
 
       for (const id of seiyuuIds) {
-        const response = await fetch("/api/anilist", {
+        const response = await fetch(apiUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

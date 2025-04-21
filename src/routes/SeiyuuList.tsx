@@ -14,6 +14,10 @@ interface Seiyuu {
   favourites: number;
 }
 
+const apiUrl = import.meta.env.DEV
+  ? "/api/anilist"
+  : "/.netlify/functions/anilist";
+
 const SeiyuuList = () => {
   const [filteredSeiyuus, setFilteredSeiyuus] = useState<Seiyuu[]>([]);
   const [page, setPage] = useState(1);
@@ -22,7 +26,7 @@ const SeiyuuList = () => {
   const fetchSeiyuus = async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/anilist", {
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
