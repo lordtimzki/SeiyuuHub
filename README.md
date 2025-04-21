@@ -1,56 +1,72 @@
-# React + TypeScript + Vite
+# Web Development Final Project - *HobbyHub*
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Submitted by: **Timothy Dacalos**
 
-Currently, two official plugins are available:
+This web app: **SeiyuuHub**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Time spent: **15** hours spent in total
 
-## Expanding the ESLint configuration
+## Required Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+The following **required** functionality is completed:
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-});
-```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- [x] **Web app includes a create form that allows the user to create posts**
+  - Form requires users to add a post title
+  - Forms should have the option for users to add:
+    - additional textual content
+    - an image added as an external image URL
+- [x] **Web app includes a home feed displaying previously created posts**
+  -  Web app must include home feed displaying previously created posts
+  -  By default, each post on the posts feed should show only the post's:
+      - creation time
+      - title
+      - upvotes count
+  - Clicking on a post should direct the user to a new page for the selected post
+- [x] **Users can view posts in different ways**
+  - Users can sort posts by either:
+    - creation time
+    - upvotes count
+  - Users can search for posts by title
+- [x] **Users can interact with each post in different ways**
+  - The app includes a separate post page for each created post when clicked, where any additional information is shown, including:
+    - content
+    - image
+    - comments
+  - Users can leave comments underneath a post on the post page
+  - Each post includes an upvote button on the post page.
+    - Each click increases the post's upvotes count by one
+    - Users can upvote any post any number of times
+- [ ] **A post that a user previously created can be edited or deleted from its post pages**
+  - After a user creates a new post, they can go back and edit the post
+  - A previously created post can be deleted from its post page
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    "react-x": reactX,
-    "react-dom": reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs["recommended-typescript"].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-});
-```
+The following **additional** features are implemented:
 
-]
+* [x] Each post is dedicated to a specific voice actor
+
+## Video Walkthrough
+
+Here's a walkthrough of implemented user stories:
+
+<img src='https://i.imgur.com/Zx3aejd.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+
+GIF created with Kap  
+
+
+## License
+
+    Copyright [2025] [Timothy Dacalos]
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
