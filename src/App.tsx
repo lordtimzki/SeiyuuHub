@@ -6,6 +6,8 @@ import Home from "./routes/Home";
 import Create from "./routes/Create";
 import SeiyuuList from "./routes/SeiyuuList";
 import Seiyuu from "./routes/Seiyuu";
+import Post from "./routes/Post";
+import SeiyuuPost from "./components/SeiyuuPost";
 
 function App() {
   const element = useRoutes([
@@ -24,6 +26,10 @@ function App() {
     {
       path: "/seiyuu/:id",
       element: <Seiyuu />,
+    },
+    {
+      path: "/post/:id",
+      element: <Post />,
     },
   ]);
   return (
