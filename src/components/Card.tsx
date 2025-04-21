@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 interface CardProps {
   attributes: {
     id: string;
@@ -27,11 +28,11 @@ const Card = ({ attributes }: CardProps) => {
         )}
       </div>
 
-      <a
-        href={`/seiyuu/${attributes.id}`}
+      <Link
+        to={`/seiyuu/${attributes.id}`}
         className="absolute inset-0"
         aria-label={`View details for ${attributes.name}`}
-      ></a>
+      ></Link>
     </div>
   );
 };
