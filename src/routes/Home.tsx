@@ -334,12 +334,6 @@ const Home = () => {
                       </Link>
                     </div>
 
-                    {post.content && (
-                      <p className="text-gray-700 mb-4 line-clamp-2">
-                        {post.content}
-                      </p>
-                    )}
-
                     <div className="flex flex-wrap gap-4">
                       {post.image && (
                         <div className="w-24 h-24 bg-gray-100 rounded">
