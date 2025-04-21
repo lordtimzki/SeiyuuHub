@@ -4,11 +4,30 @@ import { supabase } from "../../client.ts";
 
 const Post = () => {
   const { id } = useParams();
-  const [post, setPost] = useState(null);
-  const [comments, setComments] = useState([]);
+  interface Post {
+    id: string;
+    title: string;
+    content?: string;
+    user: string;
+    created_at: string;
+    seiyuu: string;
+    upvotes?: number;
+    image?: string;
+    video?: string;
+  }
+
+  const [post, setPost] = useState<Post | null>(null);
+  const [comments, setComments] = useState<
+    {
+      id: string;
+      post_Id: string;
+      content: string;
+      created_at: string;
+    }[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [commentLoading, setCommentLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [seiyuuName, setSeiyuuName] = useState("");
   const [newComment, setNewComment] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -48,15 +67,26 @@ const Post = () => {
 
       // Fetch seiyuu name
       await fetchSeiyuuName(postData.seiyuu);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Error fetching post:", err);
-      setError(err.message || "Failed to load post");
+      setError(err instanceof Error ? err.message : "Failed to load post");
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchSeiyuuName = async (seiyuuId) => {
+  interface AnilistResponse {
+    data?: {
+      Staff?: {
+        id: number;
+        name: {
+          full: string;
+        };
+      };
+    };
+  }
+
+  const fetchSeiyuuName = async (seiyuuId: string): Promise<void> => {
     try {
       const response = await fetch("/api/anilist", {
         method: "POST",
@@ -66,29 +96,36 @@ const Post = () => {
         },
         body: JSON.stringify({
           query: `
-            query ($id: Int) {
-              Staff(id: $id) {
-                id
-                name {
-                  full
-                }
-              }
-            }
-          `,
+                    query ($id: Int) {
+                        Staff(id: $id) {
+                            id
+                            name {
+                                full
+                            }
+                        }
+                    }
+                `,
           variables: { id: parseInt(seiyuuId) },
         }),
       });
 
-      const data = await response.json();
+      const data: AnilistResponse = await response.json();
       if (data.data?.Staff) {
         setSeiyuuName(data.data.Staff.name.full);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Error fetching seiyuu name:", err);
     }
   };
 
-  const handleSubmitComment = async (e) => {
+  interface Comment {
+    id: string;
+    post_Id: string;
+    content: string;
+    created_at: string;
+  }
+
+  const handleSubmitComment = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!newComment.trim()) return;
 
@@ -110,12 +147,12 @@ const Post = () => {
 
       // Add new comment to the list
       if (data && data.length > 0) {
-        setComments([...comments, data[0]]);
+        setComments([...comments, data[0] as Comment]);
       }
 
       // Clear input
       setNewComment("");
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Error adding comment:", err);
       alert("Failed to add comment. Please try again.");
     } finally {
@@ -147,23 +184,38 @@ const Post = () => {
     }
   };
 
-  const getYouTubeVideoId = (url) => {
+  interface YouTubeVideoParser {
+    (url: string): string | null;
+  }
+
+  const getYouTubeVideoId: YouTubeVideoParser = (
+    url: string
+  ): string | null => {
     if (!url) return null;
-    const regExp =
+    const regExp: RegExp =
       /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-    const match = url.match(regExp);
+    const match: RegExpMatchArray | null = url.match(regExp);
     return match && match[7].length === 11 ? match[7] : null;
   };
 
-  const formatDate = (dateString) => {
+  interface DateFormatOptions {
+    year: "numeric" | "2-digit";
+    month: "numeric" | "2-digit" | "long" | "short" | "narrow";
+    day: "numeric" | "2-digit";
+    hour: "numeric" | "2-digit";
+    minute: "numeric" | "2-digit";
+  }
+
+  const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
+    const options: DateFormatOptions = {
       year: "numeric",
       month: "short",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-    });
+    };
+    return date.toLocaleDateString("en-US", options);
   };
 
   if (loading) {
@@ -388,8 +440,8 @@ const Post = () => {
               alt={post.title}
               className="max-w-full h-auto rounded-lg mx-auto"
               onError={(e) => {
-                e.target.onerror = null;
-                e.target.src =
+                (e.target as HTMLImageElement).onerror = null;
+                (e.target as HTMLImageElement).src =
                   "https://via.placeholder.com/800x450?text=Image+Not+Available";
               }}
             />

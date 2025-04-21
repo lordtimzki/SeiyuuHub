@@ -2,13 +2,25 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../../client.ts";
 
+interface Post {
+  id: number;
+  title: string;
+  content?: string;
+  user: string;
+  seiyuu: string;
+  created_at: string;
+  upvotes: number;
+  image?: string;
+  video?: string;
+}
+
 const Home = () => {
-  const [posts, setPosts] = useState([]);
-  const [filteredPosts, setFilteredPosts] = useState([]);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState("newest"); // "newest", "oldest", "upvotes"
-  const [seiyuuNames, setSeiyuuNames] = useState({});
+  const [seiyuuNames, setSeiyuuNames] = useState<Record<string, string>>({});
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
@@ -16,7 +28,6 @@ const Home = () => {
   }, [sortBy]);
 
   useEffect(() => {
-    // Filter posts whenever search query changes
     if (!searchQuery.trim()) {
       setFilteredPosts(posts);
     } else {
@@ -70,7 +81,13 @@ const Home = () => {
     }
   };
 
-  const handleSearch = (e) => {
+  interface SearchChangeEvent {
+    target: {
+      value: string;
+    };
+  }
+
+  const handleSearch = (e: SearchChangeEvent): void => {
     setSearchQuery(e.target.value);
   };
 
@@ -78,10 +95,28 @@ const Home = () => {
     setSearchQuery("");
   };
 
-  const fetchSeiyuuNames = async (postsData) => {
+  interface AnilistResponse {
+    data?: {
+      Staff?: {
+        id: number;
+        name: {
+          full: string;
+        };
+      };
+    };
+  }
+
+  interface FetchSeiyuuNamesParams {
+    seiyuu: string;
+    [key: string]: string | number | boolean | null | undefined;
+  }
+
+  const fetchSeiyuuNames = async (
+    postsData: FetchSeiyuuNamesParams[]
+  ): Promise<void> => {
     try {
       const seiyuuIds = [...new Set(postsData.map((post) => post.seiyuu))];
-      const namesMap = {};
+      const namesMap: Record<string, string> = {};
 
       for (const id of seiyuuIds) {
         const response = await fetch("/api/anilist", {
@@ -105,7 +140,7 @@ const Home = () => {
           }),
         });
 
-        const data = await response.json();
+        const data: AnilistResponse = await response.json();
         if (data.data?.Staff) {
           namesMap[id] = data.data.Staff.name.full;
         } else {
@@ -119,21 +154,31 @@ const Home = () => {
     }
   };
 
-  const getYouTubeVideoId = (url) => {
+  interface YouTubeUrlMatchResult extends Array<string> {
+    [index: number]: string;
+  }
+
+  const getYouTubeVideoId = (url: string): string | null => {
     if (!url) return null;
-    const regExp =
+    const regExp: RegExp =
       /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-    const match = url.match(regExp);
+    const match: YouTubeUrlMatchResult | null = url.match(regExp);
     return match && match[7].length === 11 ? match[7] : null;
   };
 
-  const formatDate = (dateString) => {
+  interface FormatDateOptions {
+    year: "numeric";
+    month: "short";
+    day: "numeric";
+  }
+
+  const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
-    });
+    } as FormatDateOptions);
   };
 
   return (
@@ -292,7 +337,6 @@ const Home = () => {
                     )}
 
                     <div className="flex flex-wrap gap-4">
-                      {/* Rest of your post content... */}
                       {post.image && (
                         <div className="w-24 h-24 bg-gray-100 rounded">
                           <img
@@ -300,8 +344,9 @@ const Home = () => {
                             alt=""
                             className="w-full h-full object-cover rounded"
                             onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src =
+                              const imgElement = e.target as HTMLImageElement;
+                              imgElement.onerror = null;
+                              imgElement.src =
                                 "https://via.placeholder.com/150?text=Image";
                             }}
                           />

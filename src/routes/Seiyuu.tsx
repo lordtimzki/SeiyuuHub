@@ -3,8 +3,40 @@ import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import SeiyuuPost from "../components/SeiyuuPost";
 
+interface DateData {
+  year: number;
+  month: number;
+  day: number;
+}
+
+interface SeiyuuType {
+  id: number;
+  name: {
+    full: string;
+    native: string;
+  };
+  homeTown?: string;
+  image?: {
+    large: string;
+  };
+  dateOfBirth?: DateData;
+  dateOfDeath?: DateData;
+  age?: number;
+  characters?: {
+    nodes: {
+      id: number;
+      name: {
+        full: string;
+      };
+      image?: {
+        medium: string;
+      };
+    }[];
+  };
+}
+
 const Seiyuu = () => {
-  const [seiyuuData, setSeiyuuData] = useState(null);
+  const [seiyuuData, setSeiyuuData] = useState<SeiyuuType | null>(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
 
@@ -56,7 +88,7 @@ const Seiyuu = () => {
             }
           `,
           variables: {
-            id: parseInt(id),
+            id: parseInt(id || "0"),
           },
         }),
       });
@@ -77,7 +109,13 @@ const Seiyuu = () => {
       <div className="container mx-auto p-4 text-center">Seiyuu not found</div>
     );
 
-  const formatDate = (dateObj) => {
+  interface DateFormat {
+    year?: number;
+    month?: number;
+    day?: number;
+  }
+
+  const formatDate = (dateObj: DateFormat | undefined): string => {
     if (!dateObj || !dateObj.year) return "Unknown";
     return `${dateObj.year}-${dateObj.month
       ?.toString()
@@ -135,31 +173,32 @@ const Seiyuu = () => {
             </div>
           </div>
 
-          {seiyuuData.characters?.nodes?.length > 0 && (
-            <div className="mt-6 bg-white rounded-lg shadow-md p-4">
-              <h2 className="text-xl font-bold mb-4">Notable Characters</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                {seiyuuData.characters.nodes
-                  .filter(
-                    (character) =>
-                      character.name.full.toLowerCase() !== "narrator" &&
-                      character.name.full.toLowerCase() !== "narration"
-                  )
-                  .map((character) => (
-                    <div key={character.id} className="text-center">
-                      <img
-                        src={character.image?.medium}
-                        alt={character.name.full}
-                        className="w-full h-30 rounded-md"
-                      />
-                      <p className="text-xs mt-1 truncate">
-                        {character.name.full}
-                      </p>
-                    </div>
-                  ))}
+          {seiyuuData.characters?.nodes &&
+            seiyuuData.characters.nodes.length > 0 && (
+              <div className="mt-6 bg-white rounded-lg shadow-md p-4">
+                <h2 className="text-xl font-bold mb-4">Notable Characters</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {seiyuuData.characters.nodes
+                    .filter(
+                      (character) =>
+                        character.name.full.toLowerCase() !== "narrator" &&
+                        character.name.full.toLowerCase() !== "narration"
+                    )
+                    .map((character) => (
+                      <div key={character.id} className="text-center">
+                        <img
+                          src={character.image?.medium}
+                          alt={character.name.full}
+                          className="w-full h-30 rounded-md"
+                        />
+                        <p className="text-xs mt-1 truncate">
+                          {character.name.full}
+                        </p>
+                      </div>
+                    ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
 
         <div className="w-full md:w-2/3 lg:w-3/4">
@@ -174,7 +213,7 @@ const Seiyuu = () => {
               </Link>
             </div>
             <div className="border-t border-gray-200 pt-4">
-              <SeiyuuPost seiyuuId={seiyuuData.id} />
+              <SeiyuuPost seiyuuId={String(seiyuuData.id)} />
             </div>
           </div>
         </div>

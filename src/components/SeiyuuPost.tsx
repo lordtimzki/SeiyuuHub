@@ -1,10 +1,27 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "../../client.ts";
 
-const SeiyuuPost = ({ seiyuuId }) => {
-  const [posts, setPosts] = useState([]);
+interface SeiyuuPostProps {
+  seiyuuId: string;
+}
+
+interface Post {
+  id: string;
+  title: string;
+  content?: string;
+  image?: string;
+  video?: string;
+  upvotes: number;
+  user: string;
+  created_at: string;
+  seiyuu: string;
+}
+
+const SeiyuuPost = ({ seiyuuId }: SeiyuuPostProps) => {
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchPosts();
@@ -29,7 +46,20 @@ const SeiyuuPost = ({ seiyuuId }) => {
     }
   };
 
-  const handleUpvote = async (postId, currentUpvotes) => {
+  interface UpvoteHandlerParams {
+    postId: string;
+    currentUpvotes: number;
+    e: React.MouseEvent<HTMLButtonElement>;
+  }
+
+  const handleUpvote = async ({
+    postId,
+    currentUpvotes,
+    e,
+  }: UpvoteHandlerParams): Promise<void> => {
+    e.stopPropagation();
+    e.preventDefault();
+
     try {
       // Update the post in Supabase
       const { error } = await supabase
@@ -51,7 +81,7 @@ const SeiyuuPost = ({ seiyuuId }) => {
     }
   };
 
-  const getYouTubeVideoId = (url) => {
+  const getYouTubeVideoId = (url: string): string | null => {
     if (!url) return null;
     const regExp =
       /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
@@ -59,7 +89,15 @@ const SeiyuuPost = ({ seiyuuId }) => {
     return match && match[7].length === 11 ? match[7] : null;
   };
 
-  const formatDate = (dateString) => {
+  interface DateFormatOptions {
+    year: "numeric";
+    month: "short";
+    day: "numeric";
+    hour: "2-digit";
+    minute: "2-digit";
+  }
+
+  const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
       year: "numeric",
@@ -67,7 +105,7 @@ const SeiyuuPost = ({ seiyuuId }) => {
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-    });
+    } as DateFormatOptions);
   };
 
   if (loading) return <p className="text-gray-500">Loading posts...</p>;
@@ -82,15 +120,22 @@ const SeiyuuPost = ({ seiyuuId }) => {
   return (
     <div className="space-y-8">
       {posts.map((post) => (
-        <div
+        <Link
+          to={`/post/${post.id}`}
           key={post.id}
-          className="border-b border-gray-200 pb-6 mb-6 last:border-0"
+          className="block border-b border-gray-200 pb-6 mb-6 last:border-0 hover:bg-gray-50 transition-colors rounded-lg p-4"
         >
           <div className="flex justify-between items-start mb-3">
             <h3 className="text-xl font-semibold">{post.title}</h3>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => handleUpvote(post.id, post.upvotes || 0)}
+                onClick={(e) =>
+                  handleUpvote({
+                    postId: post.id,
+                    currentUpvotes: post.upvotes || 0,
+                    e,
+                  })
+                }
                 className="flex items-center gap-1 text-gray-500 hover:text-blue-500 transition-colors"
                 aria-label="Upvote post"
               >
@@ -118,7 +163,7 @@ const SeiyuuPost = ({ seiyuuId }) => {
           </p>
 
           {post.content && (
-            <p className="text-gray-700 mb-4 whitespace-pre-line">
+            <p className="text-gray-700 mb-4 whitespace-pre-line line-clamp-3">
               {post.content}
             </p>
           )}
@@ -129,9 +174,10 @@ const SeiyuuPost = ({ seiyuuId }) => {
                 src={post.image}
                 alt={post.title}
                 className="max-h-96 rounded-lg object-contain"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src =
+                onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                  const imgElement = e.target as HTMLImageElement;
+                  imgElement.onerror = null;
+                  imgElement.src =
                     "https://via.placeholder.com/400x300?text=Image+Not+Available";
                 }}
               />
@@ -149,10 +195,29 @@ const SeiyuuPost = ({ seiyuuId }) => {
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 className="w-full h-72 rounded-lg"
+                onClick={(e) => e.stopPropagation()}
               ></iframe>
             </div>
           )}
-        </div>
+
+          <div className="mt-4 text-sm flex items-center text-blue-600">
+            <span>View full post</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 ml-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </div>
+        </Link>
       ))}
     </div>
   );

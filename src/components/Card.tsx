@@ -1,4 +1,13 @@
-const Card = ({ attributes }) => {
+interface CardProps {
+  attributes: {
+    id: string;
+    image: string;
+    name: string;
+    nativeName?: string;
+  };
+}
+
+const Card = ({ attributes }: CardProps) => {
   return (
     <div className="w-40 h-60 relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col group">
       <img

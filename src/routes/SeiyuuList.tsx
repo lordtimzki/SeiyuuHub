@@ -1,9 +1,21 @@
 import { useState, useEffect } from "react";
 import Card from "../components/Card";
 
+interface Seiyuu {
+  id: number;
+  name: {
+    full: string;
+    native: string;
+  };
+  image: {
+    large: string;
+  };
+  primaryOccupations: string[];
+  favourites: number;
+}
+
 const SeiyuuList = () => {
-  const [seiyuus, setSeiyuus] = useState([]);
-  const [filteredSeiyuus, setFilteredSeiyuus] = useState([]);
+  const [filteredSeiyuus, setFilteredSeiyuus] = useState<Seiyuu[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
@@ -38,12 +50,17 @@ const SeiyuuList = () => {
         }),
       });
       const data = await response.json();
-      const voiceActors = data.data.Page.staff.filter(
-        (staff) =>
+      const voiceActors: Seiyuu[] = data.data.Page.staff.filter(
+        (staff: {
+          id: number;
+          name: { full: string; native: string };
+          image: { large: string };
+          primaryOccupations?: string[];
+          favourites: number;
+        }) =>
           staff.primaryOccupations &&
           staff.primaryOccupations.includes("Voice Actor")
       );
-      setSeiyuus(voiceActors);
       setFilteredSeiyuus(voiceActors);
       setLoading(false);
     } catch (error) {
@@ -76,7 +93,7 @@ const SeiyuuList = () => {
             <Card
               key={seiyuu.id}
               attributes={{
-                id: seiyuu.id,
+                id: seiyuu.id.toString(),
                 image: seiyuu.image.large,
                 name: seiyuu.name.full,
                 nativeName: seiyuu.name.native,

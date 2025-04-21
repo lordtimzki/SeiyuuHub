@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "../../client.ts";
 
 const Create = () => {
@@ -16,23 +16,26 @@ const Create = () => {
   const [error, setError] = useState("");
   const [seiyuuError, setSeiyuuError] = useState("");
 
-  const handleChange = (e) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-
-    if (name === "seiyuuId") {
-      setSeiyuuName("");
-      setSeiyuuError("");
+    if (
+      name &&
+      typeof name === "string" &&
+      Object.keys(formData).includes(name)
+    ) {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
     }
   };
 
-  const getYouTubeVideoId = (url) => {
-    const regExp =
+  const getYouTubeVideoId = (url: string): string | false => {
+    const regExp: RegExp =
       /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-    const match = url.match(regExp);
+    const match: RegExpMatchArray | null = url.match(regExp);
     return match && match[7].length === 11 ? match[7] : false;
   };
 
@@ -94,10 +97,20 @@ const Create = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  interface PostData {
+    title: string;
+    user: string;
+    seiyuu: number;
+    content: string | null;
+    image: string | null;
+    video: string | null;
+    created_at: Date;
+    upvotes: number;
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Form validation
     if (!formData.title.trim()) {
       setError("Title is required");
       return;
@@ -129,7 +142,7 @@ const Create = () => {
             video: formData.videoUrl || null,
             created_at: new Date(),
             upvotes: 0,
-          },
+          } as PostData,
         ])
         .select();
 
@@ -139,7 +152,6 @@ const Create = () => {
 
       console.log("Post created:", data);
 
-      // Reset form
       setFormData({
         title: "",
         user: "",
@@ -282,7 +294,7 @@ const Create = () => {
                   alt="Preview"
                   className="h-24 w-auto object-contain border border-gray-300"
                   onError={(e) =>
-                    (e.target.src =
+                    ((e.target as HTMLImageElement).src =
                       "https://via.placeholder.com/150?text=Invalid+Image")
                   }
                 />
@@ -332,9 +344,12 @@ const Create = () => {
           <div className="flex justify-end">
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={loading}
+              className={`px-6 py-2 ${
+                loading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
+              } text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
             >
-              Create Post
+              {loading ? "Creating..." : "Create Post"}
             </button>
           </div>
         </form>
